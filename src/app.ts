@@ -1,24 +1,15 @@
-import { useExpressServer } from "routing-controllers";
-import dotenv from "dotenv";
-import log4js from "log4js";
-import { UserController } from "./controller/user-controller";
-import express, { Express } from "express";
-import bodyParser from "body-parser";
+import express from "express";
+import { processNotFoundEndpoint } from "./middleware/not-found.middleware";
+import { processError } from "./middleware/process-error.middleware";
+import { mountRouter as mountUserRouter } from "./user/user.router";
 
-dotenv.config();
+const app = express();
 
-const logger = log4js.getLogger();
-logger.level = process.env.LOG_LEVEL;
+app.use(express.json());
 
-const app: Express = express();
+mountUserRouter(app);
 
-app.use(bodyParser.json());
+app.use(processNotFoundEndpoint);
+app.use(processError);
 
-useExpressServer(app, {
-  controllers: [UserController], // we specify controllers we want to use
-});
-const port = process.env.PORT;
-
-app.listen(port, () => console.log(`Running on port ${port}`));
-
-logger.info("application start");
+export { app };
