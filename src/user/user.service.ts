@@ -11,11 +11,8 @@ class UserService {
       },
     });
 
-    console.log(await conflict[0])
-    console.log(await conflict)
-
-    if (await conflict[0] !== undefined) {
-      throw new AppError('this phone is already registered', 422);
+    if ((await conflict[0]) !== undefined) {
+      throw new AppError("this phone is already registered", 400);
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -29,7 +26,21 @@ class UserService {
     const newUser = User.save(user);
     return token;
   }
-  async login(phone: string, password: string) {}
+  async login(phone: string, password: string) {
+    const conflict = await User.find({
+      where: {
+        phone: phone.toString(),
+      },
+    });
+
+    const validPassword = await bcrypt.compare(password, conflict[0].password);
+    if (validPassword) {
+      const token = generateAccessToken({ username: phone });
+      return token;
+    } else {
+      throw new AppError("Invalid username/password supplied", 400);
+    }
+  }
 }
 
 export const userService = new UserService();
