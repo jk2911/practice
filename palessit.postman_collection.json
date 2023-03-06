@@ -45,7 +45,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/login",
+					"raw": "http://localhost:3000/user/login",
 					"protocol": "http",
 					"host": [
 						"localhost"
